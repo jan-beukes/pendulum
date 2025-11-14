@@ -84,6 +84,10 @@
     (def [pos mass color] [((pendulum :pos) i) ((pendulum :masses) i) ((pendulum :colors) i)])
     (draw-circle-v pos (* mass mass-scale) color)))
 
+(defn clamp
+  [x a b]
+  (max a (min x b)))
+
 (defn main
   [file &opt num]
   (default num "3")
@@ -110,16 +114,34 @@
   (def pendulum (new-pendulum masses lengths angles colors))
 
   (def background-color 0x181818ff)
-  (set-target-fps 120)
   (init-window screen-size screen-size "Pendulum")
-  (set-window-monitor 0)
+  (set-target-fps 120)
+
+  (def camera (camera-2d :target [center center]))
+  (set (camera :offset) (camera :target))
+  (set (camera :zoom) 1)
 
   (def substeps 10)
   (while (not (window-should-close))
     (def dt (get-frame-time))
+    (def scroll (get-mouse-wheel-move))
+    (cond 
+      # zoom
+      (not= scroll 0.0)
+      (set (camera :zoom) (clamp (+ (math/exp (math/log (camera :zoom))) (* scroll 0.2)) 0.125 64.0))
+
+      # move
+      (key-down? :down)
+      (set (camera :target) (vector2-add (camera :target) [0 (* 500 dt)]))
+      (key-down? :up)
+      (set (camera :target) (vector2-sub (camera :target) [0 (* 500 dt)])))
+
+
     (for i 0 substeps (update-pendulum pendulum (/ dt substeps)))
     (begin-drawing)
+    (begin-mode-2d camera)
     (clear-background background-color)
     (draw-pendulum pendulum)
+    (end-mode-2d)
     (end-drawing))
   (close-window))
