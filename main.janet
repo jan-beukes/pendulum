@@ -1,4 +1,4 @@
-(use jaylib)
+(use ./jaylib/build/jaylib)
 
 (def screen-size 800)
 (def center (/ screen-size 2))
@@ -115,7 +115,7 @@
 
   (def background-color 0x181818ff)
   (init-window screen-size screen-size "Pendulum")
-  (set-target-fps 120)
+  (set-target-fps 60)
 
   (def camera (camera-2d :target [center center]))
   (set (camera :offset) (camera :target))
