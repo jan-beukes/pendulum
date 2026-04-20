@@ -1,4 +1,4 @@
-(use ./jaylib/build/jaylib)
+(use ./jaylib)
 
 (def screen-size 800)
 (def center (/ screen-size 2))
